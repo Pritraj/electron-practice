@@ -11,14 +11,15 @@ function createWindow () {
 
   mainWindow = new BrowserWindow({
     width: 1000, height: 800,
-    webPreferences: { nodeIntegration: true }
+    webPreferences: { nodeIntegration: true },
+    frame:false,
   });
 
   // Load index.html into the new BrowserWindow
   mainWindow.loadFile('index.html');
 
   // Open DevTools - Remove for PRODUCTION!
-  mainWindow.webContents.openDevTools();
+//   mainWindow.webContents.openDevTools();
 
   // Listen for window being closed
   mainWindow.on('closed',  () => {
@@ -32,6 +33,10 @@ app.on('ready', createWindow);
 // Quit when all windows are closed - (Not macOS - Darwin)
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit()
+});
+
+app.on('before-quit', () => {
+    console.log("App is quitting!!!");
 });
 
 // When app icon is clicked and app is running, (macOS) recreate the BrowserWindow
