@@ -1,31 +1,31 @@
-// Modules
 const {app, BrowserWindow, session} = require('electron');
 const url = require("url");
 const path = require("path");
 
-// Keep a global reference of the window object, if you don't, the window will
-// be closed automatically when the JavaScript object is garbage collected.
-let mainWindow
+let mainWindow;
 
-// Create a new BrowserWindow when `app` is ready
 function createWindow () {
 
-  let ses = session.defaultSession
+  
+  //****************************
+  // Custom Session
+  //****************************
+  // this session is not persisted on closure of the app/ window
+  // let customSes = session.fromPartition('part1')
 
-  let getCookies = () => {
-    ses.cookies.get({ name:'cookie1' }, (err, cookies) => {
-      console.log(cookies)
-    })
-  }
-
+  // not this will persist
+  // let customSes = session.fromPartition('persist:part1')
+  
   mainWindow = new BrowserWindow({
     width: 1000, height: 800,
-    webPreferences: { nodeIntegration: true }
-  })
+    x:100, y:100,
+    webPreferences: { nodeIntegration: true}
+  });
 
-  // Load index.html into the new BrowserWindow
-  mainWindow.loadFile('index.html')
-  // mainWindow.loadURL('https://github.com')
+  sideWindow = new BrowserWindow({
+    width: 600, height: 400,
+    webPreferences: { nodeIntegration: true , partition:'persist:part1'} // { nodeIntegration: true , session: customSes}
+  });
 
   mainWindow.loadURL(
     url.format({
@@ -35,36 +35,54 @@ function createWindow () {
     })
   );
 
+  sideWindow.loadURL(
+    url.format({
+      pathname: path.join(__dirname, `/dist/index.html`),
+      protocol: "file:",
+      slashes: true
+    })
+  );
 
-  // let cookie = { url:'https://myappdomain.com', name:'cookie1', value:'electron', expirationDate:1613852855 }
-  //
-  // ses.cookies.set( cookie, err => {
-  //   console.log('cookie1 set')
-  //   getCookies()
-  // })
-
-  // mainWindow.webContents.on('did-finish-load', e => {
-  //   getCookies()
-  // })
-
-  // Open DevTools - Remove for PRODUCTION!
+  sideWindow.webContents.openDevTools();
   mainWindow.webContents.openDevTools();
 
-  // Listen for window being closed
+
   mainWindow.on('closed',  () => {
     mainWindow = null
-  })
+  });
+
+  sideWindow.on('closed',  () => {
+    mainWindow = null
+  });
+
+ //-------------------*****************----------------------------
+  let wc = mainWindow.webContents;
+  wc.on("context-menu", (e,params)=>{
+    console.log(params.selectionText);
+  });
+
+  let ses = mainWindow.webContents.session;
+  let ses2 = sideWindow.webContents.session;
+
+  console.log(Object.is(ses, ses2));
+
+  
+
 }
 
 // Electron `app` is ready
-app.on('ready', createWindow)
+app.on('ready', createWindow);
 
 // Quit when all windows are closed - (Not macOS - Darwin)
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit()
-})
+});
+
+app.on('before-quit', () => {
+    console.log("App is quitting!!!");
+});
 
 // When app icon is clicked and app is running, (macOS) recreate the BrowserWindow
 app.on('activate', () => {
   if (mainWindow === null) createWindow()
-})
+});
