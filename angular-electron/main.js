@@ -33,7 +33,6 @@ function createWindow () {
     mainWindow = null
   });
 
-
   /*
 
   //-------------------*****************----------------------------
@@ -54,11 +53,15 @@ function createWindow () {
 
   */
  //-------------------*****************----------------------------
-let wc = mainWindow.webContents 
-
-console.log(wc);
-
+  let wc = mainWindow.webContents;
   
+  wc.on("context-menu", (e,params)=>{
+    console.log(params.selectionText);
+  });
+
+
+  let session = mainWindow.webContents.session;
+  console.log(session);
 }
 
 // Electron `app` is ready
