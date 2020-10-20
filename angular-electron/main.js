@@ -16,6 +16,11 @@ function createWindow () {
     webPreferences: { nodeIntegration: true }
   });
 
+  sideWindow = new BrowserWindow({
+    width: 600, height: 400,
+    webPreferences: { nodeIntegration: true }
+  });
+
   // Load index.html into the new BrowserWindow
   mainWindow.loadURL(
     url.format({
@@ -25,24 +30,6 @@ function createWindow () {
     })
   );
 
-  // Open DevTools - Remove for PRODUCTION!
-  mainWindow.webContents.openDevTools();
-
-  // Listen for window being closed
-  mainWindow.on('closed',  () => {
-    mainWindow = null
-  });
-
-  /*
-
-  //-------------------*****************----------------------------
-  // Open Secondary window of less size
-  sideWindow = new BrowserWindow({
-    width: 600, height: 400,
-    webPreferences: { nodeIntegration: true }
-  });
-
-  // Load index.html into the new BrowserWindow
   sideWindow.loadURL(
     url.format({
       pathname: path.join(__dirname, `/dist/index.html`),
@@ -51,17 +38,31 @@ function createWindow () {
     })
   );
 
-  */
+  // Open DevTools - Remove for PRODUCTION!
+  sideWindow.webContents.openDevTools();
+  mainWindow.webContents.openDevTools();
+
+
+  // Listen for window being closed
+  mainWindow.on('closed',  () => {
+    mainWindow = null
+  });
+
+  sideWindow.on('closed',  () => {
+    mainWindow = null
+  });
+
  //-------------------*****************----------------------------
   let wc = mainWindow.webContents;
-  
   wc.on("context-menu", (e,params)=>{
     console.log(params.selectionText);
   });
 
-
   let session = mainWindow.webContents.session;
-  console.log(session);
+  let session2 = sideWindow.webContents.session;
+  
+  console.log(Object.is(session, session2));
+
 }
 
 // Electron `app` is ready
