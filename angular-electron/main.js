@@ -1,27 +1,32 @@
-// Modules
-const {app, BrowserWindow} = require('electron');
+const {app, BrowserWindow, session} = require('electron');
 const url = require("url");
 const path = require("path");
 
-// Keep a global reference of the window object, if you don't, the window will
-// be closed automatically when the JavaScript object is garbage collected.
 let mainWindow;
 
-// Create a new BrowserWindow when `app` is ready
 function createWindow () {
+
+  
+  //****************************
+  // Custom Session
+  //****************************
+  // this session is not persisted on closure of the app/ window
+  // let customSes = session.fromPartition('part1')
+
+  // not this will persist
+  // let customSes = session.fromPartition('persist:part1')
   
   mainWindow = new BrowserWindow({
     width: 1000, height: 800,
     x:100, y:100,
-    webPreferences: { nodeIntegration: true }
+    webPreferences: { nodeIntegration: true}
   });
 
   sideWindow = new BrowserWindow({
     width: 600, height: 400,
-    webPreferences: { nodeIntegration: true }
+    webPreferences: { nodeIntegration: true , partition:'persist:part1'} // { nodeIntegration: true , session: customSes}
   });
 
-  // Load index.html into the new BrowserWindow
   mainWindow.loadURL(
     url.format({
       pathname: path.join(__dirname, `/dist/index.html`),
@@ -38,12 +43,10 @@ function createWindow () {
     })
   );
 
-  // Open DevTools - Remove for PRODUCTION!
   sideWindow.webContents.openDevTools();
   mainWindow.webContents.openDevTools();
 
 
-  // Listen for window being closed
   mainWindow.on('closed',  () => {
     mainWindow = null
   });
@@ -58,10 +61,12 @@ function createWindow () {
     console.log(params.selectionText);
   });
 
-  let session = mainWindow.webContents.session;
-  let session2 = sideWindow.webContents.session;
+  let ses = mainWindow.webContents.session;
+  let ses2 = sideWindow.webContents.session;
+
+  console.log(Object.is(ses, ses2));
+
   
-  console.log(Object.is(session, session2));
 
 }
 
