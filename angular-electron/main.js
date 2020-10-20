@@ -10,21 +10,15 @@ let mainWindow
 // Create a new BrowserWindow when `app` is ready
 function createWindow () {
 
-  let ses = session.defaultSession
-
-  let getCookies = () => {
-    ses.cookies.get({ name:'cookie1' }, (err, cookies) => {
-      console.log(cookies)
-    })
-  }
+  let ses = session.defaultSession;
+ 
 
   mainWindow = new BrowserWindow({
     width: 1000, height: 800,
     webPreferences: { nodeIntegration: true }
   })
 
-  // Load index.html into the new BrowserWindow
-  mainWindow.loadFile('index.html')
+  // mainWindow.loadFile('index.html')
   // mainWindow.loadURL('https://github.com')
 
   mainWindow.loadURL(
@@ -36,19 +30,16 @@ function createWindow () {
   );
 
 
-  // let cookie = { url:'https://myappdomain.com', name:'cookie1', value:'electron', expirationDate:1613852855 }
-  //
-  // ses.cookies.set( cookie, err => {
-  //   console.log('cookie1 set')
-  //   getCookies()
-  // })
-
-  // mainWindow.webContents.on('did-finish-load', e => {
-  //   getCookies()
-  // })
-
   // Open DevTools - Remove for PRODUCTION!
   mainWindow.webContents.openDevTools();
+
+  ses.on("will-download", (e, downloadItem, webContents) =>{
+    
+    let fileName = downloadItem.getFilename();
+    let fileSize = downloadItem.getTotalBytes();
+    console.log(path.join(app.getPath("desktop") , `${fileName}`));
+    downloadItem.setSavePath(path.join(app.getPath("desktop") , `${fileName}`))
+  })
 
   // Listen for window being closed
   mainWindow.on('closed',  () => {
