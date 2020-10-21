@@ -1,25 +1,23 @@
 // Modules
-const {app, BrowserWindow, session} = require('electron');
+const {app, BrowserWindow, session, ipcMain} = require('electron');
 const url = require("url");
 const path = require("path");
 
-// Keep a global reference of the window object, if you don't, the window will
-// be closed automatically when the JavaScript object is garbage collected.
 let mainWindow
 
-// Create a new BrowserWindow when `app` is ready
+ipcMain.on('asynchronous-message', (event, arg) => {
+  console.log(arg) // prints "ping"
+  event.reply('asynchronous-reply', 'pong')
+})
+
 function createWindow () {
 
   let ses = session.defaultSession;
- 
 
   mainWindow = new BrowserWindow({
     width: 1000, height: 800,
     webPreferences: { nodeIntegration: true }
-  })
-
-  // mainWindow.loadFile('index.html')
-  // mainWindow.loadURL('https://github.com')
+  });
 
   mainWindow.loadURL(
     url.format({
@@ -29,14 +27,11 @@ function createWindow () {
     })
   );
 
-
-  // Open DevTools - Remove for PRODUCTION!
   mainWindow.webContents.openDevTools();
 
   ses.on("will-download", (e, downloadItem, webContents) =>{
     
     let fileName = downloadItem.getFilename();
-    let fileSize = downloadItem.getTotalBytes();
     console.log(path.join(app.getPath("desktop") , `${fileName}`));
     downloadItem.setSavePath(path.join(app.getPath("desktop") , `${fileName}`))
   })
