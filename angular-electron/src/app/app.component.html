@@ -1,6 +1,10 @@
 <ul>
-  <li>
-    <a routerLink="/first-component">first-component</a>
+  <li *ngFor="let tab of tabs; index as i">
+    <a routerLink="[tab]">{{tab}}</a>
   </li>
+  <li>
+    <a (click)="addTab(i)"> Add </a> 
+  </li>
+  
 </ul>
 <router-outlet></router-outlet>

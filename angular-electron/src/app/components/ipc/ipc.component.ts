@@ -8,16 +8,16 @@ import { ElectronService } from 'ngx-electron';
 })
 export class IpcComponent implements OnInit {
 
-  constructor(private _electronService: ElectronService) { }
+  constructor(private es: ElectronService) { }
 
     public playPingPong() {
         console.log("playPingPong");
-        this._electronService
+        this.es
             .ipcRenderer.send('asynchronous-message', 'ping');
     }
 
     public beep() {
-        this._electronService.shell.beep();
+        this.es.shell.beep();
     }
 
   ngOnInit(): void {

@@ -7,5 +7,11 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
 
+    tabs = ['tab']
+
+    addTab(index){
+      this.tabs.push()
+    }
+
     title = 'angular-electron';
 }
